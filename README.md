@@ -207,6 +207,35 @@ For Cloudera Manager to find the parcel, set the Parcel Repository URL to `http:
 - Cloudera Manager's parcel page shows CDH 7.3.1 as available.
 
 ### Notes
+ 1. Parcel (irreplaceable without the Cloudera login, 14 GB)
+  - CDH-7.3.1-1.cdh7.3.1.p900.80138085-el8.parcel
+  - its .sha file
+  - manifest.json, which the parcel repo needs and which is missing from cm01 today
+  - the .torrent is optional
+
+  2. Cloudera RPMs (about 2.3 GB)
+  - cloudera-manager-daemons, -agent, -server (7.13.1.1400)
+  - openjdk8-8.0+372_1-cloudera from the 7.11.3.0 repo
+  - RPM-GPG-KEY-cloudera, so gpgcheck=1 keeps working offline
+
+  3. RHEL packages (size depends on how much you mirror)
+  - The 15 or so packages the playbook installs, plus their dependencies. These are small, about 21 MB for the direct list.
+  - A full BaseOS and AppStream mirror is tens of gigabytes. Back it up if you want to rebuild the offline lab without a
+    subscription.
+
+  4. Cluster state (not part of the repo, but needed to restore)
+  - PostgreSQL dumps of the scm and hive databases, which hold the cluster definition and Metastore.
+  - The Cloudera licence file.
+  - The playbook, its vars.yml, and the encrypted vault with its vault password stored separately.
+
+  Notes
+  - Don't back up repodata/. createrepo_c regenerates it from the RPMs, so the RPMs and the .sha checksums are what matter.
+  - Record a checksum for each file when you back it up, and verify them again before restoring. Use sha256sum for RPMs and
+    the parcel .sha for the parcel.
+  - Keep at least two copies on separate disks. The source for all of this is Cloudera's archive, which needs your
+    subscription, so a local backup is the only guarantee if that access lapses.
+
+
 
 - **Licensing:** Cloudera packages are licensed. Keep this mirror inside the lab, and check that your Cloudera agreement allows internal copies.
 - **Updates:** Re-run Steps 2–4 when you want new packages. Keep old copies if clusters are pinned to specific versions.
